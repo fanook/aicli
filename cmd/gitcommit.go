@@ -120,11 +120,9 @@ var gcCmd = &cobra.Command{
 			logrus.Fatal("Commit 信息为空，取消提交。")
 		}
 
-		fmt.Printf("\n最终的 commit 信息:\n%s\n\n", finalCommitMessage)
+		fmt.Printf("最终的 commit 信息:\n%s\n\n", finalCommitMessage)
 
-		// 提示用户确认
-		fmt.Println("按下回车键以确认并执行 Git 提交，或按其他键取消。")
-		fmt.Print("确认提交？[Y/n]: ")
+		fmt.Print("确认提交？[y/n]: ")
 
 		// 捕捉用户输入
 		var userInput string
@@ -132,7 +130,7 @@ var gcCmd = &cobra.Command{
 
 		userInput = strings.ToLower(strings.TrimSpace(userInput))
 
-		if userInput == "n" || userInput == "no" {
+		if userInput != "y" && userInput != "Y" {
 			logrus.Info("操作已取消。")
 			return
 		}
@@ -142,14 +140,13 @@ var gcCmd = &cobra.Command{
 		if err != nil {
 			logrus.Fatalf("执行 'git add .' 失败: %v\n输出: %s", err, string(addOutput))
 		}
-		logrus.Info("'git add .' 执行成功。")
 
 		commitCmd := exec.Command("git", "commit", "-m", finalCommitMessage)
 		commitOutput, err := commitCmd.CombinedOutput()
 		if err != nil {
 			logrus.Fatalf("执行 'git commit' 失败: %v\n输出: %s", err, string(commitOutput))
 		}
-		logrus.Info("'git commit' 执行成功。")
+		logrus.Infof("成功。")
 	},
 }
 
