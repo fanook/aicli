@@ -21,11 +21,18 @@
 
 
 
-## 安装
-### 1. 使用Go安装
+## 安装和使用
+### 1. 安装
+#### 方法1: 通过Go安装
+如果您已经安装了 Go 开发环境，可以直接通过以下命令安装：
 ```shell
 go install github.com/fanook/aicli@latest
 ```
+#### 方法2: 下载预编译的二进制文件安装
+- 前往 [Releases 页面](https://github.com/fanook/aicli/releases) 下载适合您操作系统的执行文件。
+- 下载完成后，将文件移动到系统的 PATH 路径中，例如 /usr/local/bin。
+
+
 ### 2. 验证安装
 ```shell
 aicli help 
