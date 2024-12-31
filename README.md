@@ -7,7 +7,9 @@
 
 ## 描述
 一款基于 AI 的命令行工具集，旨在为开发者与程序员提供便捷、高效、有趣的命令行体验。
-![2024-12-3112 51 17-ezgif com-video-to-gif-converter](https://github.com/user-attachments/assets/bcd7823f-5c5a-44fb-afb2-315a7f005f65)
+
+![2024-12-3112 51 17-ezgif com-video-to-gif-converter (1)](https://github.com/user-attachments/assets/f8ccd3c2-d25e-4a86-b7f9-cc9b6c78cb6e)
+
 
 
 
