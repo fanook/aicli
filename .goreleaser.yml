@@ -1,0 +1,32 @@
+project_name: aicli
+
+builds:
+  - id: default
+    main: ./main.go
+    goos:
+      - linux
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    binary: aicli
+    env:
+      - CGO_ENABLED=0
+
+archives:
+  - id: default
+    format: tar.gz
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    files:
+      - LICENSE
+      - README.md
+
+release:
+  github:
+    owner: fanook
+    name: aicli
+  draft: false
+  prerelease: false
+
+changelog:
+  use: git
