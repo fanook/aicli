@@ -47,7 +47,7 @@ export AICLI_OPENAI_API_KEY=sk-sccvcat-qXAMosGXIrEs-MT3FqNOkGhGsOBcZ3XtJ6O_pbgeF
 AICLI_OPENAI_API_KEY=sk-sccvcat-qXAMosGXIrEs-MT3FqNOkGhGsOBcZ3XtJ6O_pbgeFJ_u9uwT3szVHYcjMZOYqf2Jv8WcUVTKKmAEtkCtjjrenHbc5zESoczT3BlboLGuUbRCTCYMVp5wr15Z64c6e4ykWcmc4rAA
 
 # 以下为可选配置，当前显示为默认值。
-AICLI_OPENAI_MODEL=gpt-4o-mini
+AICLI_OPENAI_MODEL=gpt-4o
 AICLI_OPENAI_API_URL=https://api.openai.com/v1/chat/completions
 AICLI_GITCOMMIT_PROMPT="你是一个帮助生成 Git commit 信息的助手。请根据以下 Git 仓库的变更生成一个简洁且有意义的 Git commit 信息。请严格遵循以下格式，并且只能使用以下两种类别：\n\n[类别] 描述\n\n**可用类别：**\n- **feat**: 新功能\n- **fix**: 修复\n\n**示例：**\n[fix] 修复用户登录时的验证错误\n[feat] 添加用户个人资料页面\n\n变更内容：\n{{.Changes}}"
 AICLI_GENCMD_PROMPT="你是一个帮助生成命令行指令和解释的助手, 请根据以下描述生成一个适合当前机器的命令行指令，并提供简要的解释：描述：{{.Description}} 操作系统：{{.OS}} 架构：{{.Arch}}  生成的格式举例(严格按照此格式)： CMD: free -m \n 解释: 显示当前系统内存使用情况"
