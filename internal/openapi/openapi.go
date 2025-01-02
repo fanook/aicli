@@ -118,10 +118,6 @@ func GenerateContent(apiKey, prompt string) (string, error) {
 		Model: model,
 		Messages: []OpenAIMessage{
 			{
-				Role:    "system",
-				Content: "你是一个内容生成助手。",
-			},
-			{
 				Role:    "user",
 				Content: prompt,
 			},
