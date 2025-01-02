@@ -39,6 +39,9 @@ go install github.com/fanook/aicli@latest
 aicli help 
 ```
 ### 3. 配置依赖的环境变量
+```shell
+export AICLI_OPENAI_API_KEY=sk-sccvcat-qXAMosGXIrEs-MT3FqNOkGhGsOBcZ3XtJ6O_pbgeFJ_u9uwT3szVHYcjMZOYqf2Jv8WcUVTKKmAEtkCtjjrenHbc5zESoczT3BlboLGuUbRCTCYMVp5wr15Z64c6e4ykWcmc4rAA
+```
 ```dotenv
 # AICLI_OPENAI_API_KEY 是必需配置的 OpenAI API 密钥。
 AICLI_OPENAI_API_KEY=sk-sccvcat-qXAMosGXIrEs-MT3FqNOkGhGsOBcZ3XtJ6O_pbgeFJ_u9uwT3szVHYcjMZOYqf2Jv8WcUVTKKmAEtkCtjjrenHbc5zESoczT3BlboLGuUbRCTCYMVp5wr15Z64c6e4ykWcmc4rAA
