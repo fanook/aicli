@@ -39,7 +39,7 @@ func getOpenAIConfig() (string, string, error) {
 
 	model := os.Getenv("AICLI_OPENAI_MODEL")
 	if model == "" {
-		model = "gpt-4o-mini"
+		model = "gpt-4o"
 	}
 
 	return apiURL, model, nil

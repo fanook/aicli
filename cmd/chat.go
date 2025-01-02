@@ -88,7 +88,7 @@ var chatCmd = &cobra.Command{
 
 			conversation.History = append(conversation.History, fmt.Sprintf("AI: %s", reply))
 
-			fmt.Printf("🤖: %s\n", reply)
+			fmt.Printf("AI: %s\n", reply)
 		}
 	},
 }
