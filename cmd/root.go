@@ -7,13 +7,13 @@ import (
 	"os"
 )
 
-var version = "dev" // 默认版本号
+var Version = "dev" // 默认版本号
 
 // rootCmd 是应用的根命令
 var rootCmd = &cobra.Command{
 	Use:     "aicli",
-	Version: version,
-	Short:   "ACL 是一个集合多种 AI 工具的命令行应用",
+	Version: Version,
+	Short:   "AI CLI 是一个集合多种 AI 工具的命令行应用",
 	Long: `
  ▗▄▖ ▗▄▄▄▖     ▗▄▄▖▗▖   ▗▄▄▄▖
 ▐▌ ▐▌  █      ▐▌   ▐▌     █  
