@@ -4,7 +4,7 @@ builds:
   - id: default
     main: ./main.go
     ldflags:
-      - "-X main.version={{.Tag}}"
+      - "-X github.com/fanook/aicli/cmd.version={{.Tag}}"
     goos:
       - linux
       - darwin

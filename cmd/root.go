@@ -11,10 +11,18 @@ var version = "dev" // 默认版本号
 
 // rootCmd 是应用的根命令
 var rootCmd = &cobra.Command{
-	Use:     "acl",
+	Use:     "aicli",
 	Version: version,
 	Short:   "ACL 是一个集合多种 AI 工具的命令行应用",
-	Long:    `ACL 提供了多个基于 AI 的工具，帮助开发者提高工作效率。`,
+	Long: `
+ ▗▄▖ ▗▄▄▄▖     ▗▄▄▖▗▖   ▗▄▄▄▖
+▐▌ ▐▌  █      ▐▌   ▐▌     █  
+▐▛▀▜▌  █      ▐▌   ▐▌     █  
+▐▌ ▐▌▗▄█▄▖    ▝▚▄▄▖▐▙▄▄▖▗▄█▄▖
+
+🤖  欢迎使用 ACL (AI Command Line Interface)!
+🔧  提供了多个基于 AI 的工具，帮助开发者提高工作效率。
+`,
 	Run: func(cmd *cobra.Command, args []string) {
 		cmd.Help()
 	},

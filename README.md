@@ -63,6 +63,7 @@ aicli chat
 ### 5. 更简洁的使用
 ```shell
 # 更多别名
+alias acl='aicli'
 alias agc='aicli git-cmt'
 alias ac='aicli chat'
 alias acd='aicli gen-cmd'
