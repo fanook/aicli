@@ -62,6 +62,12 @@ aicli chat
 
 ### 5. 更简洁的使用
 ```shell
+# 更多别名
+alias agc='aicli git-cmt'
+alias ac='aicli chat'
+alias acd='aicli gen-cmd'
+
+
 # 添加别名（选择合适的shell配置文件，这里以bash_profile举例）
 echo "alias ac='aicli chat'" >> ~/.bash_profile
 # 重新加载shell配置
@@ -71,4 +77,4 @@ ac
 ```
 
 ## 贡献指南
-如果您在使用或开发过程中遇到问题，欢迎在 Issues 页面提交问题或讨论。欢迎任何形式的贡献！
+如果您在使用或开发过程中遇到问题，欢迎在Issues页面提交问题或讨论。欢迎任何形式的贡献！
