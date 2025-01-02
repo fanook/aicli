@@ -3,6 +3,8 @@ project_name: aicli
 builds:
   - id: default
     main: ./main.go
+    ldflags:
+      - "-X main.version={{.Tag}}"
     goos:
       - linux
       - darwin

@@ -36,7 +36,7 @@ go install github.com/fanook/aicli@latest
 
 ### 2. 验证安装
 ```shell
-aicli help 
+aicli -v
 ```
 ### 3. 配置依赖的环境变量
 ```shell
