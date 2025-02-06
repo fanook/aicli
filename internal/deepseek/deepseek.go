@@ -41,7 +41,7 @@ func getDeepseekConfig() (string, string, string, error) {
 
 	apiKey := os.Getenv("AICLI_DEEPSEEK_API_KEY")
 	if apiKey == "" {
-		logrus.Fatal("未设置 AICLI_DEEPSEEK_API_KEY 环境变量")
+		logrus.Fatal("您当前使用的AI提供商为 deepseek ,需要设置 AICLI_DEEPSEEK_API_KEY 环境变量，您也可指定 AICLI_PROVIDER 环境变量切换AI提供商。")
 	}
 
 	return apiURL, apiKey, model, nil

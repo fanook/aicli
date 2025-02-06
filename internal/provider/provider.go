@@ -19,7 +19,7 @@ func GenerateContent(prompt string) (string, error) {
 	case "deepseek":
 		return deepseek.GenerateContent(prompt)
 	default:
-		logrus.Fatalf("未知的 AI 提供商: %s, 请检查配置。", provider)
+		logrus.Fatalf("未支持的 AI 提供商: %s, 请检查配置。", provider)
 		return "", nil
 	}
 }
