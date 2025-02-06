@@ -33,8 +33,8 @@
 - 示例csv：
 ```csv
 id,content,prompt,result
-1,你好,你好瘦{{.Content}}是否是脏话,你只需回复是或否,否
-2,你好,fuck{{.Content}}是否是脏话，你只需回复是或否,是
+1,你好,你好瘦,{{.Content}}是否是脏话 你只需回复是或否,否
+2,你好,fuck,{{.Content}}是否是脏话 你只需回复是或否,是
 ```
 - db表结构：
 ```sql
