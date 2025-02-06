@@ -27,7 +27,7 @@ func GitCommit(message string) error {
 	}
 
 	// 执行 commit
-	commitCmd := exec.Command("git", "commit", "-m", message)
+	commitCmd := exec.Command("git2", "commit", "-m", message)
 	commitCmd.Stdout = os.Stdout
 	commitCmd.Stderr = os.Stderr
 	return commitCmd.Run()
