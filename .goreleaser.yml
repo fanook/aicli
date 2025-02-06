@@ -8,10 +8,10 @@ builds:
     goos:
       - linux
       - darwin
+      - windows
     goarch:
       - amd64
       - arm64
-      - windows
     binary: aicli
     env:
       - CGO_ENABLED=0
