@@ -3,7 +3,7 @@ package cmd
 import (
 	"bytes"
 	"fmt"
-	openapi "github.com/fanook/aicli/internal/openapi"
+	"github.com/fanook/aicli/internal/provider"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"os"
@@ -49,7 +49,7 @@ var jokeCmd = &cobra.Command{
 
 		prompt := promptBuffer.String()
 
-		joke, err := openapi.GenerateContent(apiKey, prompt)
+		joke, err := provider.GenerateContent(prompt)
 		if err != nil {
 			logrus.Fatalf("生成笑话失败: %v", err)
 		}

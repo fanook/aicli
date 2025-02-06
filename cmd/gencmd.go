@@ -3,7 +3,7 @@ package cmd
 import (
 	"bytes"
 	"fmt"
-	openai "github.com/fanook/aicli/internal/openapi"
+	"github.com/fanook/aicli/internal/provider"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"os"
@@ -61,7 +61,7 @@ var genCmd = &cobra.Command{
 
 		prompt := promptBuffer.String()
 
-		response, err := openai.GenerateContent(apiKey, prompt)
+		response, err := provider.GenerateContent(prompt)
 		if err != nil {
 			logrus.Fatalf("生成命令失败: %v", err)
 		}

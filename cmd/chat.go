@@ -4,11 +4,11 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"github.com/fanook/aicli/internal/provider"
 	"os"
 	"strings"
 	"text/template"
 
-	openapi "github.com/fanook/aicli/internal/openapi"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -23,11 +23,6 @@ var chatCmd = &cobra.Command{
 	Long:    `使用 AI 进行持续的对话，维持上下文和历史记录。`,
 	Example: `  acl chat`,
 	Run: func(cmd *cobra.Command, args []string) {
-		apiKey := os.Getenv("AICLI_OPENAI_API_KEY")
-		if apiKey == "" {
-			logrus.Fatal("未设置 AICLI_OPENAI_API_KEY 环境变量")
-		}
-
 		templateStr, err := cmd.Flags().GetString("prompt")
 		if err != nil {
 			logrus.Fatalf("获取 prompt 标志失败: %v", err)
@@ -81,7 +76,7 @@ var chatCmd = &cobra.Command{
 
 			fullPrompt := strings.Join(conversation.History, "\n") + "\nAI:"
 
-			reply, err := openapi.GenerateContent(apiKey, fullPrompt)
+			reply, err := provider.GenerateContent(fullPrompt)
 			if err != nil {
 				logrus.Fatalf("生成回复失败: %v", err)
 			}

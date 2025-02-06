@@ -1,37 +1,34 @@
-// internal/openapi/openai.go
 package openai
 
 import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"strings"
 )
 
-// OpenAIRequest 定义发送给 OpenAI 的请求结构
-type OpenAIRequest struct {
-	Model    string          `json:"model"`
-	Messages []OpenAIMessage `json:"messages"`
+type Request struct {
+	Model    string    `json:"model"`
+	Messages []Message `json:"messages"`
 }
 
-// OpenAIMessage 定义消息结构
-type OpenAIMessage struct {
+type Message struct {
 	Role    string `json:"role"`
 	Content string `json:"content"`
 }
 
-// OpenAIResponse 定义从 OpenAI 接收的响应结构
-type OpenAIResponse struct {
+type Response struct {
 	Choices []struct {
-		Message OpenAIMessage `json:"message"`
+		Message Message `json:"message"`
 	} `json:"choices"`
 }
 
 // getOpenAIConfig 读取 OpenAI 配置信息
-func getOpenAIConfig() (string, string, error) {
+func getOpenAIConfig() (string, string, string, error) {
 	apiURL := os.Getenv("AICLI_OPENAI_API_URL")
 	if apiURL == "" {
 		apiURL = "https://api.openai.com/v1/chat/completions"
@@ -42,19 +39,23 @@ func getOpenAIConfig() (string, string, error) {
 		model = "gpt-4o"
 	}
 
-	return apiURL, model, nil
+	apiKey := os.Getenv("AICLI_OPENAI_API_KEY")
+	if apiKey == "" {
+		logrus.Fatal("未设置 AICLI_OPENAI_API_KEY 环境变量")
+	}
+
+	return apiURL, apiKey, model, nil
 }
 
-// GenerateContent 使用 OpenAI 生成内容
-func GenerateContent(apiKey, prompt string) (string, error) {
-	apiURL, model, err := getOpenAIConfig()
+func GenerateContent(prompt string) (string, error) {
+	apiURL, apiKey, model, err := getOpenAIConfig()
 	if err != nil {
 		return "", err
 	}
 
-	requestBody := OpenAIRequest{
+	requestBody := Request{
 		Model: model,
-		Messages: []OpenAIMessage{
+		Messages: []Message{
 			{
 				Role:    "user",
 				Content: prompt,
@@ -87,7 +88,7 @@ func GenerateContent(apiKey, prompt string) (string, error) {
 		return "", fmt.Errorf("OpenAI API 返回错误: %s", string(bodyBytes))
 	}
 
-	var openAIResp OpenAIResponse
+	var openAIResp Response
 	err = json.NewDecoder(resp.Body).Decode(&openAIResp)
 	if err != nil {
 		return "", err

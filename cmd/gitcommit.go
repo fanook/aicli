@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/fanook/aicli/internal/githelper"
-	openapi "github.com/fanook/aicli/internal/openapi"
+	"github.com/fanook/aicli/internal/provider"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"io/ioutil"
@@ -68,7 +68,7 @@ var gcCmd = &cobra.Command{
 
 		prompt := promptBuffer.String()
 
-		commitMessage, err := openapi.GenerateContent(apiKey, prompt)
+		commitMessage, err := provider.GenerateContent(prompt)
 		if err != nil {
 			logrus.Fatalf("生成 commit 信息失败: %v", err)
 		}

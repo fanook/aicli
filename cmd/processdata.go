@@ -6,12 +6,12 @@ import (
 	"database/sql"
 	"encoding/csv"
 	"fmt"
+	"github.com/fanook/aicli/internal/provider"
 	"os"
 	"strings"
 	"text/template"
 	"time"
 
-	openai "github.com/fanook/aicli/internal/openapi"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 
@@ -69,22 +69,17 @@ func init() {
 }
 
 func runProcessData() {
-	apiKey := os.Getenv("AICLI_OPENAI_API_KEY")
-	if apiKey == "" {
-		logrus.Fatal("未设置 AICLI_OPENAI_API_KEY 环境变量")
-	}
-
 	switch strings.ToLower(sourceType) {
 	case "csv":
 		if csvFile == "" {
 			logrus.Fatal("当数据源为csv时，必须指定--csv-file参数")
 		}
-		processCSV(apiKey, promptText, csvFile, csvOut)
+		processCSV(promptText, csvFile, csvOut)
 	case "db":
 		if dbName == "" || dbTable == "" {
 			logrus.Fatal("当数据源为db时，必须指定--db-name 和 --db-table 参数")
 		}
-		processDB(apiKey, promptText, dbHost, dbPort, dbUser, dbPass, dbName, dbTable)
+		processDB(promptText, dbHost, dbPort, dbUser, dbPass, dbName, dbTable)
 	default:
 		logrus.Fatalf("未知的数据源类型：%s", sourceType)
 	}
@@ -92,7 +87,7 @@ func runProcessData() {
 
 // processCSV 从CSV文件中读取数据，调用AI生成回复后输出到新的CSV文件
 // CSV 文件中每行必须有四列：id, content, prompt, result
-func processCSV(apiKey, globalPrompt, inputFile, outputFile string) {
+func processCSV(globalPrompt, inputFile, outputFile string) {
 	file, err := os.Open(inputFile)
 	if err != nil {
 		logrus.Fatalf("打开CSV文件失败: %v", err)
@@ -137,7 +132,7 @@ func processCSV(apiKey, globalPrompt, inputFile, outputFile string) {
 		content := row[1]
 		existingPrompt := row[2]
 
-		logrus.Infof("正在处理 [%d/%d] 行，ID: %s", i+1, total, id)
+		logrus.Infof("正在处理 [%d/%d]，ID: %s", i+1, total, id)
 
 		var finalPrompt string
 		var buf bytes.Buffer
@@ -153,20 +148,18 @@ func processCSV(apiKey, globalPrompt, inputFile, outputFile string) {
 			Content: content,
 		})
 		if err != nil {
-			logrus.Errorf("行 %d (ID:%s) 模板执行失败: %v", i+2, id, err)
+			logrus.Fatalf("填充行[id:%d]提示模板失败: %v", err, id)
 			finalPrompt = existingPrompt
 		} else {
 			finalPrompt = buf.String()
 		}
-
-		logrus.Info("finalPrompt: ", finalPrompt)
 
 		rowCtx, rowCancel := context.WithTimeout(context.Background(), 60*time.Second)
 		replyChan := make(chan string, 1)
 		errChan := make(chan error, 1)
 
 		go func(prompt string) {
-			reply, err := openai.GenerateContent(apiKey, prompt)
+			reply, err := provider.GenerateContent(prompt)
 			if err != nil {
 				errChan <- err
 			} else {
@@ -183,7 +176,7 @@ func processCSV(apiKey, globalPrompt, inputFile, outputFile string) {
 			logrus.Errorf("行 %d (ID:%s) 生成回复失败: %v", i+2, id, err)
 			reply = ""
 		case reply = <-replyChan:
-			logrus.Infof("行 %d (ID:%s) 回复生成成功", i+2, id)
+
 		}
 		rowCancel()
 
@@ -208,7 +201,7 @@ func processCSV(apiKey, globalPrompt, inputFile, outputFile string) {
 
 // processDB 从数据库中读取未处理的数据行，调用AI生成回复后更新记录
 // 数据库表必须有 id, content, prompt, result 四个字段，其中 result 为空表示未处理
-func processDB(apiKey, globalPrompt, host, port, user, pass, dbName, tableName string) {
+func processDB(globalPrompt, host, port, user, pass, dbName, tableName string) {
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
 		user, pass, host, port, dbName)
 	db, err := sql.Open("mysql", dsn)
@@ -217,6 +210,7 @@ func processDB(apiKey, globalPrompt, host, port, user, pass, dbName, tableName s
 	}
 	defer db.Close()
 
+	// 如果提供了全局提示模板，则先解析
 	var tmpl *template.Template
 	if globalPrompt != "" {
 		tmpl, err = template.New("prompt").Parse(globalPrompt)
@@ -225,17 +219,23 @@ func processDB(apiKey, globalPrompt, host, port, user, pass, dbName, tableName s
 		}
 	}
 
+	// 先查询待处理记录的总数
+	var total int
+	countQuery := fmt.Sprintf("SELECT COUNT(*) FROM %s WHERE (result IS NULL OR result = '')", tableName)
+	if err := db.QueryRowContext(context.Background(), countQuery).Scan(&total); err != nil {
+		logrus.Fatalf("统计待处理记录失败: %v", err)
+	}
+
 	updateStmt, err := db.PrepareContext(context.Background(),
-		fmt.Sprintf("UPDATE %s SET prompt = ?, result = ? WHERE id = ?", tableName))
+		fmt.Sprintf("UPDATE %s SET result = ? WHERE id = ?", tableName))
 	if err != nil {
 		logrus.Fatalf("准备更新语句失败: %v", err)
 	}
 	defer updateStmt.Close()
 
-	// 分页查询，每页处理 100 行
-	pageSize := 100
+	// 分页查询，每页处理指定数量的记录（这里示例为2）
+	pageSize := 2
 	totalProcessed := 0
-	page := 0
 	startID := 0
 
 	for {
@@ -255,10 +255,12 @@ func processDB(apiKey, globalPrompt, host, port, user, pass, dbName, tableName s
 			}
 			recordsInPage++
 			totalProcessed++
-			logrus.Infof("正在处理记录 [%d] (总计 %d) - ID: %d", recordsInPage+(page*pageSize), totalProcessed, id)
+			// 此处显示当前处理进度和总数
+			logrus.Infof("正在处理 [%d/%d]，ID: %d", totalProcessed, total, id)
 
 			startID = id
 
+			// 根据是否存在全局提示，决定使用全局模板还是每行模板
 			var finalPrompt string
 			if globalPrompt != "" {
 				var buf bytes.Buffer
@@ -274,14 +276,29 @@ func processDB(apiKey, globalPrompt, host, port, user, pass, dbName, tableName s
 					finalPrompt = buf.String()
 				}
 			} else {
-				finalPrompt = rowPrompt
+				tmpl, err = template.New("prompt").Parse(rowPrompt)
+				if err != nil {
+					logrus.Fatalf("解析行[id:%d]提示模板失败: %v", err, id)
+				}
+				var buf bytes.Buffer
+				err = tmpl.Execute(&buf, struct {
+					Content string
+				}{
+					Content: content,
+				})
+				if err != nil {
+					logrus.Fatalf("填充行[id:%d]提示模板失败: %v", err, id)
+				} else {
+					finalPrompt = buf.String()
+				}
 			}
 
+			// 为每条记录设置超时
 			rowCtx, rowCancel := context.WithTimeout(context.Background(), 60*time.Second)
 			replyChan := make(chan string, 1)
 			errChan := make(chan error, 1)
 			go func(prompt string) {
-				reply, err := openai.GenerateContent(apiKey, prompt)
+				reply, err := provider.GenerateContent(prompt)
 				if err != nil {
 					errChan <- err
 				} else {
@@ -298,11 +315,9 @@ func processDB(apiKey, globalPrompt, host, port, user, pass, dbName, tableName s
 				logrus.Errorf("ID %d 生成回复失败: %v", id, err)
 				reply = ""
 			case reply = <-replyChan:
-				_, err = updateStmt.ExecContext(context.Background(), finalPrompt, reply, id)
+				_, err = updateStmt.ExecContext(context.Background(), reply, id)
 				if err != nil {
 					logrus.Errorf("ID %d 更新结果失败: %v", id, err)
-				} else {
-					logrus.Infof("ID %d 更新成功", id)
 				}
 			}
 			rowCancel()
@@ -310,11 +325,8 @@ func processDB(apiKey, globalPrompt, host, port, user, pass, dbName, tableName s
 		rows.Close()
 
 		if recordsInPage == 0 {
-			logrus.Infof("没有更多记录需要处理，总共更新 %d 条记录", totalProcessed)
+			logrus.Info("处理完成")
 			break
 		}
-
-		page++
-		logrus.Infof("第 %d 页处理完成，共处理 %d 条记录", page, totalProcessed)
 	}
 }
